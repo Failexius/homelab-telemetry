@@ -1,0 +1,31 @@
+# macOS Systemdateien
+.DS_Store
+Thumbs.db
+
+# Sensible Umgebungsdaten & Passwörter (NIEMALS committen!)
+.env
+*.env
+!.env.example
+
+# Go Binaries & Build-Artefakte
+agent/agent*
+hub/hub*
+*.exe
+*.test
+bin/
+dist/
+
+# Flutter / Dart temporäre Build-Artefakte
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.framework
+ios/Flutter/Flutter.framework
+
+# Lokale IDE-Dateien
+.idea/
+.vscode/
+*.swp
