@@ -7,14 +7,18 @@ Because the Raspberry Pi runs with a strict 1 GB RAM limit alongside existing se
 ## Structure
 
 ```
-[ Nodes: PC / Pi ] --(HTTP POST)--> [ Central Hub ] <--(HTTP / WS)--> [ Mobile App ]
-     (agent)                             (hub)                           (mobile)
+[ Nodes: PC / Pi ] --(HTTP POST)--> [ Central Hub ] <--(HTTP)--> [ Client ]
+     (agent)                             (hub)                (planned: mobile app)
 ```
 
 - `agent/`: Daemon running on each host. Collects system vitals (CPU, memory, disk, thermal sensors via `gopsutil`) and watches the local Docker socket for container status and crash/OOM events. Pushes snapshots to the hub every 1.5 seconds.
 - `hub/`: Central service running on the Pi (`:8088`). Keeps the latest state of all nodes in memory (`POST /api/telemetry`, `GET /api/state`) and serves as the backend for the client app.
 - `shared/`: Shared Go structs (`types.go`) for telemetry payloads, container metrics, and incident events.
-- `mobile/`: Flutter dashboard client (in progress).
+
+### Planned
+
+- **Mobile dashboard:** a Flutter client that reads the hub state. Not part of the repository yet.
+- **Live updates:** pushing state changes from the hub over WebSocket instead of polling `GET /api/state`.
 
 ## Building and Running
 
