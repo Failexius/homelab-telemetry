@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"log"
+	"maps"
 	"net/http"
 	"sync"
 	"telemetry/shared"
-	"time"
 )
 
 type HubState struct {
@@ -64,29 +62,11 @@ func handleState(w http.ResponseWriter, r *http.Request) {
 
 	// Thread-sicher lesen (mehrere Leser dürfen gleichzeitig lesen)
 	state.mu.RLock()
-	defer state.mu.RUnlock()
+	stateNodesCopy := maps.Clone(state.Nodes)
+	state.mu.RUnlock()
 
-	json.NewEncoder(w).Encode(state.Nodes)
-}
-
-func sendTelemetry(ctx context.Context, hubURL string, data shared.NodeTelemetry) error {
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return err
+	if err := json.NewEncoder(w).Encode(stateNodesCopy); err != nil {
+		log.Printf("State-Encoding fehlgeschlagen: %v", err)
+		return
 	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, hubURL+"/api/telemetry", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	httpClient := &http.Client{Timeout: 2 * time.Second}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
 }
